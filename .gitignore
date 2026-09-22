@@ -1,19 +1,14 @@
-# Build output
+# Build files
 bin/
 obj/
 
 # Visual Studio
 .vs/
 *.user
-*.userosscache
 *.suo
-*.userprefs
 
-# Visual Studio Code
+# VS Code
 .vscode/
-
-# ASP.NET generated files
-wwwroot/lib/
 
 # SQLite database
 *.db
@@ -23,13 +18,10 @@ wwwroot/lib/
 # Logs
 *.log
 
-# OS generated files
-.DS_Store
-Thumbs.db
-
 # Temporary files
 *.tmp
 *.temp
 
-# User-specific configuration
-appsettings.Development.json
+# OS files
+.DS_Store
+Thumbs.db
