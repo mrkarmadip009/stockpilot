@@ -1,0 +1,96 @@
+@model StockPilot.Models.Product
+
+@{
+    ViewData["Title"] = "Edit Product";
+}
+
+<h1>Edit Product</h1>
+
+<form asp-action="Edit" method="post">
+
+    <input type="hidden" asp-for="ProductId" />
+
+    <div asp-validation-summary="All" class="text-danger"></div>
+
+    <div class="mb-3">
+        <label asp-for="Name" class="form-label">
+            Product Name
+        </label>
+
+        <input asp-for="Name"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="CategoryId" class="form-label">
+            Category
+        </label>
+
+        <select asp-for="CategoryId"
+                asp-items="ViewBag.Categories"
+                class="form-control">
+
+            <option value="">-- Select Category --</option>
+
+        </select>
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="StockQuantity" class="form-label">
+            Stock Quantity
+        </label>
+
+        <input asp-for="StockQuantity"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="BuyingPrice" class="form-label">
+            Buying Price
+        </label>
+
+        <input asp-for="BuyingPrice"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="SellingPrice" class="form-label">
+            Selling Price
+        </label>
+
+        <input asp-for="SellingPrice"
+               class="form-control" />
+    </div>
+
+    <div class="mb-3">
+        <label asp-for="Description" class="form-label">
+            Description
+        </label>
+
+        <textarea asp-for="Description"
+                  class="form-control"></textarea>
+    </div>
+
+    <div class="form-check mb-3">
+
+        <input asp-for="IsActive"
+               class="form-check-input" />
+
+        <label asp-for="IsActive"
+               class="form-check-label">
+            Active Product
+        </label>
+
+    </div>
+
+    <button type="submit"
+            class="btn btn-success">
+        Save Changes
+    </button>
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        Back
+    </a>
+
+</form>

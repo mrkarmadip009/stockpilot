@@ -13,6 +13,7 @@ namespace StockPilot.Controllers
             _repository = repository;
         }
 
+        // READ
         public async Task<IActionResult> Index()
         {
             var categories = await _repository.GetAllAsync();
@@ -20,6 +21,18 @@ namespace StockPilot.Controllers
             return View(categories);
         }
 
+        // DETAILS
+        public async Task<IActionResult> Details(int id)
+        {
+            var category = await _repository.GetByIdAsync(id);
+
+            if (category == null)
+                return NotFound();
+
+            return View(category);
+        }
+
+        // CREATE
         public IActionResult Create()
         {
             return View();
@@ -39,14 +52,38 @@ namespace StockPilot.Controllers
             return View(category);
         }
 
+        // EDIT
+        public async Task<IActionResult> Edit(int id)
+        {
+            var category = await _repository.GetByIdAsync(id);
+
+            if (category == null)
+                return NotFound();
+
+            return View(category);
+        }
+
+        [HttpPost]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Edit(Category category)
+        {
+            if (ModelState.IsValid)
+            {
+                await _repository.UpdateAsync(category);
+
+                return RedirectToAction(nameof(Index));
+            }
+
+            return View(category);
+        }
+
+        // DELETE
         public async Task<IActionResult> Delete(int id)
         {
             var category = await _repository.GetByIdAsync(id);
 
             if (category == null)
-            {
                 return NotFound();
-            }
 
             return View(category);
         }

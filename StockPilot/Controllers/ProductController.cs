@@ -1,4 +1,5 @@
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Rendering;
 using StockPilot.Models;
 using StockPilot.Repositories;
 
@@ -7,13 +8,16 @@ namespace StockPilot.Controllers
     public class ProductController : Controller
     {
         private readonly IProductRepository _repository;
+        private readonly ICategoryRepository _categoryRepository;
 
-        public ProductController(IProductRepository repository)
+        public ProductController(
+            IProductRepository repository,
+            ICategoryRepository categoryRepository)
         {
             _repository = repository;
+            _categoryRepository = categoryRepository;
         }
 
-        // GET: /Product
         public async Task<IActionResult> Index()
         {
             var products = await _repository.GetAllAsync();
@@ -21,26 +25,30 @@ namespace StockPilot.Controllers
             return View(products);
         }
 
-        // GET: /Product/Details/5
         public async Task<IActionResult> Details(int id)
         {
             var product = await _repository.GetByIdAsync(id);
 
             if (product == null)
-            {
                 return NotFound();
-            }
 
             return View(product);
         }
 
-        // GET: /Product/Create
-        public IActionResult Create()
+        // CREATE
+        public async Task<IActionResult> Create()
         {
+            var categories = await _categoryRepository.GetAllAsync();
+
+            ViewBag.Categories = new SelectList(
+                categories,
+                "CategoryId",
+                "Name"
+            );
+
             return View();
         }
 
-        // POST: /Product/Create
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Create(Product product)
@@ -52,23 +60,38 @@ namespace StockPilot.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            var categories = await _categoryRepository.GetAllAsync();
+
+            ViewBag.Categories = new SelectList(
+                categories,
+                "CategoryId",
+                "Name",
+                product.CategoryId
+            );
+
             return View(product);
         }
 
-        // GET: /Product/Edit/5
+        // EDIT
         public async Task<IActionResult> Edit(int id)
         {
             var product = await _repository.GetByIdAsync(id);
 
             if (product == null)
-            {
                 return NotFound();
-            }
+
+            var categories = await _categoryRepository.GetAllAsync();
+
+            ViewBag.Categories = new SelectList(
+                categories,
+                "CategoryId",
+                "Name",
+                product.CategoryId
+            );
 
             return View(product);
         }
 
-        // POST: /Product/Edit/5
         [HttpPost]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> Edit(Product product)
@@ -80,23 +103,29 @@ namespace StockPilot.Controllers
                 return RedirectToAction(nameof(Index));
             }
 
+            var categories = await _categoryRepository.GetAllAsync();
+
+            ViewBag.Categories = new SelectList(
+                categories,
+                "CategoryId",
+                "Name",
+                product.CategoryId
+            );
+
             return View(product);
         }
 
-        // GET: /Product/Delete/5
+        // DELETE
         public async Task<IActionResult> Delete(int id)
         {
             var product = await _repository.GetByIdAsync(id);
 
             if (product == null)
-            {
                 return NotFound();
-            }
 
             return View(product);
         }
 
-        // POST: /Product/Delete/5
         [HttpPost, ActionName("Delete")]
         [ValidateAntiForgeryToken]
         public async Task<IActionResult> DeleteConfirmed(int id)

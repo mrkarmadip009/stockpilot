@@ -4,18 +4,18 @@ using StockPilot.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Add database context
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
-    options.UseSqlite(
-        builder.Configuration.GetConnectionString("DefaultConnection")
+    options.UseMySql(
+        builder.Configuration.GetConnectionString("DefaultConnection"),
+        ServerVersion.AutoDetect(
+            builder.Configuration.GetConnectionString("DefaultConnection")
+        )
     )
 );
 
-// Add repositories
 builder.Services.AddScoped<IProductRepository, ProductRepository>();
 builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
 
-// Add MVC
 builder.Services.AddControllersWithViews();
 
 var app = builder.Build();

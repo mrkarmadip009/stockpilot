@@ -7,16 +7,17 @@ namespace StockPilot.Models
         public int SaleId { get; set; }
 
         [Required]
-        public string CustomerName { get; set; }
+        public string CustomerName { get; set; } = "";
 
         public DateTime SaleDate { get; set; } = DateTime.Now;
 
         public decimal TotalAmount { get; set; }
 
-        public string UserName { get; set; }
+        public string? UserName { get; set; }
 
         public bool DeletedByUser { get; set; } = false;
 
         public ICollection<SaleItem> Items { get; set; }
+            = new List<SaleItem>();
     }
 }
