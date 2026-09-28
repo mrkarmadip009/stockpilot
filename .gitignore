@@ -1,27 +1,7 @@
-# Build files
 bin/
 obj/
-
-# Visual Studio
 .vs/
+.vscode/
 *.user
 *.suo
-
-# VS Code
-.vscode/
-
-# SQLite database
-*.db
-*.db-shm
-*.db-wal
-
-# Logs
-*.log
-
-# Temporary files
-*.tmp
-*.temp
-
-# OS files
-.DS_Store
-Thumbs.db
+appsettings.Development.json
