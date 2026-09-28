@@ -1,15 +1,26 @@
 namespace StockPilot.ViewModels
 {
-    public class DashboardViewModel
-    {
-        public int TotalProducts { get; set; }
+public class DashboardViewModel
+{
+public List<ProductDashboardViewModel> Products { get; set; }
+= new List<ProductDashboardViewModel>();
+}
 
-        public int TotalCategories { get; set; }
 
-        public int TotalStock { get; set; }
+public class ProductDashboardViewModel
+{
+    public int ProductId { get; set; }
 
-        public int LowStockProducts { get; set; }
+    public string ProductName { get; set; } = "";
 
-        public decimal TotalInventoryValue { get; set; }
-    }
+    public string CategoryName { get; set; } = "";
+
+    public int Quantity { get; set; }
+
+    public decimal SellingPrice { get; set; }
+
+    public string ImagePath { get; set; } = "";
+}
+
+
 }

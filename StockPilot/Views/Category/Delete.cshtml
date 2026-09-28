@@ -1,41 +1,64 @@
+```cshtml
 @model StockPilot.Models.Category
 
 @{
-    ViewData["Title"] = "Category Details";
+    ViewData["Title"] = "Delete Category";
 }
 
-<h1>Category Details</h1>
+<div class="page-header">
+    <div>
+        <h1>Delete Category</h1>
+        <p>Confirm category deletion</p>
+    </div>
+</div>
 
-<div class="card">
+<div class="delete-box">
 
-    <div class="card-body">
+    <div class="alert alert-danger">
+        <strong>Are you sure?</strong>
+        This category will be deleted permanently.
+    </div>
 
-        <h4>Category</h4>
+    <div class="details-row">
 
-        <hr />
+        <div class="details-label">
+            Category Name
+        </div>
 
-        <p>
-            <strong>ID:</strong>
-            @Model.CategoryId
-        </p>
-
-        <p>
-            <strong>Name:</strong>
+        <div class="details-value">
             @Model.Name
-        </p>
-
-        <p>
-            <strong>Total Products:</strong>
-            @Model.Products.Count
-        </p>
+        </div>
 
     </div>
 
+    <div class="details-row">
+
+        <div class="details-label">
+            Number of Products
+        </div>
+
+        <div class="details-value">
+            @Model.Products.Count
+        </div>
+
+    </div>
+
+    <form asp-action="Delete" method="post">
+
+        <input type="hidden"
+               asp-for="CategoryId" />
+
+        <button type="submit"
+                class="btn btn-danger">
+            Yes, Delete
+        </button>
+
+        <button type="button"
+                class="btn btn-secondary"
+                onclick="history.back()">
+            ← Back
+        </button>
+
+    </form>
+
 </div>
-
-<br />
-
-<a asp-action="Index"
-   class="btn btn-secondary">
-    Back
-</a>

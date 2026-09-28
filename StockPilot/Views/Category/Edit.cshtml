@@ -1,17 +1,25 @@
+```cshtml
 @model StockPilot.Models.Category
 
 @{
     ViewData["Title"] = "Edit Category";
 }
 
-<h1>Edit Category</h1>
+<div class="page-header">
+    <div>
+        <h1>Edit Category</h1>
+        <p>Update category information</p>
+    </div>
+</div>
 
 <form asp-action="Edit" method="post">
 
-    <input type="hidden" asp-for="CategoryId" />
+    <input type="hidden"
+           asp-for="CategoryId" />
 
     <div asp-validation-summary="All"
-         class="text-danger"></div>
+         class="text-danger">
+    </div>
 
     <div class="mb-3">
 
@@ -30,9 +38,10 @@
         Save Changes
     </button>
 
-    <a asp-action="Index"
-       class="btn btn-secondary">
-        Back
-    </a>
+    <button type="button"
+            class="btn btn-secondary"
+            onclick="history.back()">
+        ← Back
+    </button>
 
 </form>

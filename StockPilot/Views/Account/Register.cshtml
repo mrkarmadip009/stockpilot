@@ -1,0 +1,89 @@
+@model StockPilot.Models.User
+
+@{
+ViewData["Title"] = "Register";
+}
+
+<div class="account-page">
+
+```
+<div class="account-box">
+
+    <div class="account-logo">
+        <h1>StockPilot</h1>
+        <p>Inventory Management System</p>
+    </div>
+
+    <h2 class="text-center mb-2">Create Account</h2>
+
+    <p class="account-description">
+        Create your StockPilot account to get started.
+    </p>
+
+    <form asp-action="Register" method="post">
+
+        <div asp-validation-summary="All"
+             class="text-danger mb-3">
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Name</label>
+
+            <input asp-for="Name"
+                   class="form-control"
+                   placeholder="Enter your name" />
+
+            <span asp-validation-for="Name"
+                  class="text-danger">
+            </span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Email</label>
+
+            <input asp-for="Email"
+                   type="email"
+                   class="form-control"
+                   placeholder="Enter your email" />
+
+            <span asp-validation-for="Email"
+                  class="text-danger">
+            </span>
+        </div>
+
+        <div class="mb-3">
+            <label class="form-label">Password</label>
+
+            <input asp-for="PasswordHash"
+                   type="password"
+                   class="form-control"
+                   placeholder="Create a password" />
+
+            <span asp-validation-for="PasswordHash"
+                  class="text-danger">
+            </span>
+        </div>
+
+        <button type="submit"
+                class="btn btn-primary w-100 account-button">
+            Create Account
+        </button>
+
+    </form>
+
+    <div class="account-switch">
+        Already have an account?
+
+        <a asp-controller="Account"
+           asp-action="Login">
+            Login
+        </a>
+    </div>
+
+</div>
+```
+
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" />
+}

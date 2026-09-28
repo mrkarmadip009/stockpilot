@@ -1,71 +1,301 @@
 @model IEnumerable<StockPilot.Models.Product>
 
 @{
-    ViewData["Title"] = "Products";
+ViewData["Title"] = "Products";
+bool isAdmin = User.IsInRole("Admin");
 }
 
-<h1>Products</h1>
+<div class="products-page">
 
-<p>
-    <a asp-action="Create" class="btn btn-primary">Add Product</a>
-</p>
+    
+<!-- PAGE HEADER -->
 
-<table class="table table-bordered">
+<div class="products-page-header">
 
-    <thead>
-        <tr>
-            <th>Name</th>
-            <th>Category</th>
-            <th>Stock</th>
-            <th>Buying Price</th>
-            <th>Selling Price</th>
-            <th>Active</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
+    <div>
 
-    <tbody>
-        @foreach (var item in Model)
+        <div class="dashboard-eyebrow">
+            STOCKPILOT INVENTORY
+        </div>
+
+        <h1>Products</h1>
+
+        <p>
+            View all products and their current stock.
+        </p>
+
+    </div>
+
+
+    <div class="products-header-actions">
+
+
+        <!-- SEARCH -->
+
+        <div class="products-search-box">
+
+            <span>⌕</span>
+
+            <input type="text"
+                   id="productSearch"
+                   placeholder="Search products..." />
+
+        </div>
+
+
+        @if (isAdmin)
         {
-            <tr>
-                <td>@item.Name</td>
-
-                <td>
-                    @item.Category?.Name
-                </td>
-
-                <td>
-                    @item.StockQuantity
-                </td>
-
-               <td>₹@item.BuyingPrice.ToString("N2")</td>
-
-                <td>₹@item.SellingPrice.ToString("N2")</td>
-                <td>
-                    @(item.IsActive ? "Yes" : "No")
-                </td>
-
-                <td>
-                    <a asp-action="Details"
-                       asp-route-id="@item.ProductId"
-                       class="btn btn-info btn-sm">
-                        Details
-                    </a>
-
-                    <a asp-action="Edit"
-                       asp-route-id="@item.ProductId"
-                       class="btn btn-warning btn-sm">
-                        Edit
-                    </a>
-
-                    <a asp-action="Delete"
-                       asp-route-id="@item.ProductId"
-                       class="btn btn-danger btn-sm">
-                        Delete
-                    </a>
-                </td>
-            </tr>
+            <a asp-action="Create"
+               class="btn btn-primary">
+                + Add Product
+            </a>
         }
-    </tbody>
 
-</table>
+
+        <a asp-controller="Dashboard"
+           asp-action="Index"
+           class="btn btn-secondary">
+            ← Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+
+<!-- PRODUCTS -->
+
+@if (Model.Any())
+{
+    <div class="products-card-grid"
+         id="productGrid">
+
+        @foreach (var product in Model)
+        {
+            <div class="products-view-card product-search-item"
+                 data-name="@product.Name"
+                 data-category="@product.Category?.Name">
+
+                <!-- IMAGE -->
+
+                <div class="products-card-image">
+
+                    @if (!string.IsNullOrEmpty(product.ImagePath))
+                    {
+                        <img src="@product.ImagePath"
+                             alt="@product.Name" />
+                    }
+                    else
+                    {
+                        <div class="products-no-image">
+                            📦
+                        </div>
+                    }
+
+                </div>
+
+
+                <!-- CONTENT -->
+
+                <div class="products-card-content">
+
+                    <h3>
+                        @product.Name
+                    </h3>
+
+
+                    <span class="products-category">
+                        @product.Category?.Name
+                    </span>
+
+
+                    <div class="products-info-row">
+
+                        <div class="products-info-box">
+
+                            <span>
+                                PRICE
+                            </span>
+
+                            <strong>
+                                ₹@product.SellingPrice.ToString("0.##")
+                            </strong>
+
+                        </div>
+
+
+                        <div class="products-info-box">
+
+                            <span>
+                                QUANTITY
+                            </span>
+
+                            <strong>
+                                @product.StockQuantity
+                            </strong>
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- STOCK STATUS -->
+
+                    @if (product.StockQuantity == 0)
+                    {
+                        <div class="products-stock-status out">
+                            Out of Stock
+                        </div>
+                    }
+                    else if (product.StockQuantity < 10)
+                    {
+                        <div class="products-stock-status low">
+                            Low Stock
+                        </div>
+                    }
+                    else
+                    {
+                        <div class="products-stock-status available">
+                            Available
+                        </div>
+                    }
+
+
+                    <!-- BUTTONS -->
+
+                    <div class="products-card-actions">
+
+                        <a asp-action="Details"
+                           asp-route-id="@product.ProductId"
+                           class="product-details-button">
+                            View Details
+                        </a>
+
+
+                        @if (isAdmin)
+                        {
+                            <a asp-action="Edit"
+                               asp-route-id="@product.ProductId"
+                               class="product-edit-button">
+                                Edit
+                            </a>
+
+                            <a asp-action="Delete"
+                               asp-route-id="@product.ProductId"
+                               class="product-delete-button">
+                                Delete
+                            </a>
+                        }
+
+                    </div>
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+
+    <!-- NO SEARCH RESULT -->
+
+    <div id="productNoResults"
+         class="products-empty"
+         style="display:none;">
+
+        <div class="products-empty-icon">
+            🔍
+        </div>
+
+        <h3>
+            No Products Found
+        </h3>
+
+        <p>
+            No product matches your search.
+        </p>
+
+    </div>
+
+}
+else
+{
+    <div class="products-empty">
+
+        <div class="products-empty-icon">
+            📦
+        </div>
+
+        <h3>
+            No Products Found
+        </h3>
+
+        <p>
+            There are currently no products in the inventory.
+        </p>
+
+        @if (isAdmin)
+        {
+            <a asp-action="Create"
+               class="btn btn-primary">
+                Add First Product
+            </a>
+        }
+
+    </div>
+}
+    
+
+</div>
+
+<script>
+
+    document.getElementById("productSearch").addEventListener("input", function () {
+
+        var searchText = this.value.toLowerCase();
+
+        var products =
+            document.querySelectorAll(".product-search-item");
+
+        var visibleProducts = 0;
+
+
+        products.forEach(function (product) {
+
+            var productName =
+                product.getAttribute("data-name").toLowerCase();
+
+            var category =
+                product.getAttribute("data-category").toLowerCase();
+
+
+            if (productName.includes(searchText) ||
+                category.includes(searchText))
+            {
+                product.style.display = "";
+                visibleProducts++;
+            }
+            else
+            {
+                product.style.display = "none";
+            }
+
+        });
+
+
+        var noResults =
+            document.getElementById("productNoResults");
+
+
+        if (visibleProducts == 0 && searchText != "")
+        {
+            noResults.style.display = "block";
+        }
+        else
+        {
+            noResults.style.display = "none";
+        }
+
+    });
+
+</script>

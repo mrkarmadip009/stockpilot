@@ -1,75 +1,272 @@
 @model StockPilot.ViewModels.DashboardViewModel
 
 @{
-    ViewData["Title"] = "Dashboard";
+ViewData["Title"] = "Dashboard";
 }
 
-<h1 class="mb-4">StockPilot Dashboard</h1>
+<div class="user-dashboard">
 
-<div class="row">
 
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5>Total Products</h5>
-                <h2>@Model.TotalProducts</h2>
-            </div>
+<!-- PAGE HEADER -->
+
+<div class="dashboard-page-header">
+
+    <div>
+
+        <div class="dashboard-eyebrow">
+            STOCKPILOT INVENTORY
         </div>
-    </div>
 
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5>Total Categories</h5>
-                <h2>@Model.TotalCategories</h2>
-            </div>
-        </div>
-    </div>
+        <h1>Dashboard</h1>
 
-    <div class="col-md-4 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5>Total Stock</h5>
-                <h2>@Model.TotalStock</h2>
-            </div>
-        </div>
+        <p>
+            View available products and their current stock.
+        </p>
+
     </div>
 
 </div>
 
-<div class="row">
 
-    <div class="col-md-6 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5>Low Stock Products</h5>
-                <h2>@Model.LowStockProducts</h2>
-                <p>Products with stock below 10</p>
-            </div>
+<!-- PRODUCTS SECTION -->
+
+<div class="dashboard-products-section">
+
+    <div class="dashboard-section-header">
+
+        <div>
+
+            <h2>Products</h2>
+
+            <p>
+                Available products in inventory
+            </p>
+
         </div>
+
+
+        <!-- SEARCH -->
+
+        <div class="dashboard-search-box">
+
+            <span>⌕</span>
+
+            <input type="text"
+                   id="dashboardSearch"
+                   placeholder="Search products..." />
+
+        </div>
+
     </div>
 
-    <div class="col-md-6 mb-3">
-        <div class="card">
-            <div class="card-body">
-                <h5>Total Inventory Value</h5>
-                <h2>₹ @Model.TotalInventoryValue</h2>
-            </div>
+
+    @if (Model.Products.Any())
+    {
+        <div class="dashboard-product-grid"
+             id="dashboardProductGrid">
+
+            @foreach (var product in Model.Products)
+            {
+                <a asp-controller="Product"
+                   asp-action="Details"
+                   asp-route-id="@product.ProductId"
+                   class="dashboard-product-card-link dashboard-search-item"
+                   data-name="@product.ProductName"
+                   data-category="@product.CategoryName">
+
+                    <div class="dashboard-product-card">
+
+                        <!-- PRODUCT IMAGE -->
+
+                        <div class="dashboard-product-image">
+
+                            @if (!string.IsNullOrEmpty(product.ImagePath))
+                            {
+                                <img src="@product.ImagePath"
+                                     alt="@product.ProductName" />
+                            }
+                            else
+                            {
+                                <div class="dashboard-no-image">
+                                    📦
+                                </div>
+                            }
+
+                        </div>
+
+
+                        <!-- PRODUCT INFORMATION -->
+
+                        <div class="dashboard-product-content">
+
+                            <h3>
+                                @product.ProductName
+                            </h3>
+
+
+                            <span class="dashboard-product-category">
+                                @product.CategoryName
+                            </span>
+
+
+                            <div class="dashboard-product-info">
+
+                                <div class="dashboard-product-detail">
+
+                                    <span>
+                                        PRICE
+                                    </span>
+
+                                    <strong>
+                                        ₹@product.SellingPrice.ToString("0.##")
+                                    </strong>
+
+                                </div>
+
+
+                                <div class="dashboard-product-detail">
+
+                                    <span>
+                                        QUANTITY
+                                    </span>
+
+                                    <strong>
+                                        @product.Quantity
+                                    </strong>
+
+                                </div>
+
+                            </div>
+
+
+                            <!-- STOCK STATUS -->
+
+                            @if (product.Quantity == 0)
+                            {
+                                <div class="dashboard-stock-status out">
+                                    Out of Stock
+                                </div>
+                            }
+                            else if (product.Quantity < 10)
+                            {
+                                <div class="dashboard-stock-status low">
+                                    Low Stock
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="dashboard-stock-status available">
+                                    Available
+                                </div>
+                            }
+
+
+                            <!-- DETAILS -->
+
+                            <div class="dashboard-view-product">
+                                View Details →
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </a>
+            }
+
         </div>
-    </div>
+
+
+        <!-- NO SEARCH RESULT -->
+
+        <div id="dashboardNoResults"
+             class="dashboard-empty-products"
+             style="display:none;">
+
+            <div class="dashboard-empty-icon">
+                🔍
+            </div>
+
+            <h3>
+                No Products Found
+            </h3>
+
+            <p>
+                No product matches your search.
+            </p>
+
+        </div>
+    }
+    else
+    {
+        <div class="dashboard-empty-products">
+
+            <div class="dashboard-empty-icon">
+                📦
+            </div>
+
+            <h3>
+                No Products Available
+            </h3>
+
+            <p>
+                There are currently no products in the inventory.
+            </p>
+
+        </div>
+    }
 
 </div>
 
-<hr />
 
-<a asp-controller="Product"
-   asp-action="Index"
-   class="btn btn-primary">
-    Manage Products
-</a>
+</div>
 
-<a asp-controller="Category"
-   asp-action="Index"
-   class="btn btn-secondary">
-    Manage Categories
-</a>
+<script>
+
+    document.getElementById("dashboardSearch").addEventListener("input", function () {
+
+        var searchText = this.value.toLowerCase();
+
+        var products = document.querySelectorAll(".dashboard-search-item");
+
+        var visibleProducts = 0;
+
+        products.forEach(function (product) {
+
+            var productName =
+                product.getAttribute("data-name").toLowerCase();
+
+            var category =
+                product.getAttribute("data-category").toLowerCase();
+
+
+            if (productName.includes(searchText) ||
+                category.includes(searchText))
+            {
+                product.style.display = "";
+                visibleProducts++;
+            }
+            else
+            {
+                product.style.display = "none";
+            }
+
+        });
+
+
+        var noResults =
+            document.getElementById("dashboardNoResults");
+
+
+        if (visibleProducts == 0 && searchText != "")
+        {
+            noResults.style.display = "block";
+        }
+        else
+        {
+            noResults.style.display = "none";
+        }
+
+    });
+
+</script>

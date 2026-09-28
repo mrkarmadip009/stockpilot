@@ -1,58 +1,112 @@
 @model StockPilot.Models.Product
 
 @{
-    ViewData["Title"] = "Product Details";
+ViewData["Title"] = "Product Details";
+bool isAdmin = User.IsInRole("Admin");
 }
 
-<h1>Product Details</h1>
+<div class="page-header">
+    <div>
+        <div class="dashboard-eyebrow">
+            STOCKPILOT INVENTORY
+        </div>
 
-<div class="card">
-    <div class="card-body">
 
-        <h3>@Model.Name</h3>
+    <h1>Product Details</h1>
 
-        <hr />
+    <p>View product information and current stock.</p>
+</div>
 
-        <p>
-            <strong>Category:</strong>
-            @Model.Category?.Name
-        </p>
+<div>
+    <a asp-action="Index" class="btn btn-secondary">
+        ← Products
+    </a>
+</div>
 
-        <p>
-            <strong>Stock:</strong>
-            @Model.StockQuantity
-        </p>
 
-        <p>
-            <strong>Buying Price:</strong>
-            ₹@Model.BuyingPrice
-        </p>
+</div>
 
-        <p>
-            <strong>Selling Price:</strong>
-            ₹@Model.SellingPrice
-        </p>
+<div class="details-card">
 
-        <p>
-            <strong>Description:</strong>
-            @Model.Description
-        </p>
 
-        <p>
-            <strong>Status:</strong>
-            @(Model.IsActive ? "Active" : "Inactive")
-        </p>
+@if (!string.IsNullOrEmpty(Model.ImagePath))
+{
+    <div style="text-align:center; margin-bottom:25px;">
+        <img src="@Model.ImagePath"
+             alt="@Model.Name"
+             style="width:220px; height:180px; object-fit:cover; border-radius:14px;" />
+    </div>
+}
 
+<div class="details-row">
+    <div class="details-label">Product Name</div>
+    <div class="details-value">@Model.Name</div>
+</div>
+
+<div class="details-row">
+    <div class="details-label">Category</div>
+    <div class="details-value">@Model.Category?.Name</div>
+</div>
+
+<div class="details-row">
+    <div class="details-label">Stock Quantity</div>
+    <div class="details-value">@Model.StockQuantity</div>
+</div>
+
+<div class="details-row">
+    <div class="details-label">Price</div>
+    <div class="details-value">
+        ₹@Model.SellingPrice.ToString("0.##")
+    </div>
+</div>
+
+@if (isAdmin)
+{
+    <div class="details-row">
+        <div class="details-label">Buying Price</div>
+        <div class="details-value">
+            ₹@Model.BuyingPrice.ToString("0.##")
+        </div>
+    </div>
+
+    <div class="details-row">
+        <div class="details-label">Profit Per Item</div>
+        <div class="details-value">
+            ₹@((Model.SellingPrice - Model.BuyingPrice).ToString("0.##"))
+        </div>
+    </div>
+}
+
+<div class="details-row">
+    <div class="details-label">Description</div>
+    <div class="details-value">
+        @Model.Description
+    </div>
+</div>
+
+<div class="details-actions">
+
+    @if (isAdmin)
+    {
         <a asp-action="Edit"
            asp-route-id="@Model.ProductId"
            class="btn btn-warning">
             Edit
         </a>
 
-        <a asp-action="Index"
-           class="btn btn-secondary">
-            Back
+        <a asp-action="Delete"
+           asp-route-id="@Model.ProductId"
+           class="btn btn-danger">
+            Delete
         </a>
+    }
 
-    </div>
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        ← Back
+    </a>
+
+</div>
+
+
 </div>

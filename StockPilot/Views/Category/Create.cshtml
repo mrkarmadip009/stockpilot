@@ -1,23 +1,33 @@
+```cshtml
 @model StockPilot.Models.Category
 
 @{
     ViewData["Title"] = "Add Category";
 }
 
-<h1>Add Category</h1>
+<div class="page-header">
+    <div>
+        <h1>Add Category</h1>
+        <p>Create a new product category</p>
+    </div>
+</div>
 
 <form asp-action="Create" method="post">
 
-    <div asp-validation-summary="All" class="text-danger"></div>
+    <div asp-validation-summary="All"
+         class="text-danger">
+    </div>
 
     <div class="mb-3">
 
-        <label asp-for="Name" class="form-label">
+        <label asp-for="Name"
+               class="form-label">
             Category Name
         </label>
 
         <input asp-for="Name"
-               class="form-control" />
+               class="form-control"
+               placeholder="Enter category name" />
 
     </div>
 
@@ -26,9 +36,10 @@
         Save Category
     </button>
 
-    <a asp-action="Index"
-       class="btn btn-secondary">
-        Back
-    </a>
+    <button type="button"
+            class="btn btn-secondary"
+            onclick="history.back()">
+        ← Back
+    </button>
 
 </form>

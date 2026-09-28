@@ -1,41 +1,249 @@
 @model StockPilot.Models.Category
 
 @{
-    ViewData["Title"] = "Category Details";
+ViewData["Title"] = "Category Details";
+bool isAdmin = User.IsInRole("Admin");
 }
 
-<h1>Category Details</h1>
+<div class="category-details-page">
 
-<div class="card">
 
-    <div class="card-body">
+<div class="page-header">
 
-        <h4>Category</h4>
+    <div>
+        <div class="dashboard-eyebrow">
+            STOCKPILOT INVENTORY
+        </div>
 
-        <hr />
+        <h1>@Model.Name</h1>
 
         <p>
-            <strong>ID:</strong>
+            Products in this category.
+        </p>
+    </div>
+
+    <div>
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            ← Categories
+        </a>
+    </div>
+
+</div>
+
+
+<!-- CATEGORY INFORMATION -->
+
+<div class="category-info-card">
+
+    <div class="category-info-item">
+
+        <span>CATEGORY ID</span>
+
+        <strong>
             @Model.CategoryId
-        </p>
+        </strong>
 
-        <p>
-            <strong>Name:</strong>
+    </div>
+
+    <div class="category-info-item">
+
+        <span>CATEGORY NAME</span>
+
+        <strong>
             @Model.Name
-        </p>
+        </strong>
 
-        <p>
-            <strong>Total Products:</strong>
+    </div>
+
+    <div class="category-info-item">
+
+        <span>TOTAL PRODUCTS</span>
+
+        <strong>
             @Model.Products.Count
-        </p>
+        </strong>
 
     </div>
 
 </div>
 
-<br />
 
-<a asp-action="Index"
-   class="btn btn-secondary">
-    Back
-</a>
+<!-- PRODUCTS -->
+
+<div class="category-products-section">
+
+    <div class="category-section-header">
+
+        <div>
+            <h2>
+                Products
+            </h2>
+
+            <p>
+                Products available in @Model.Name
+            </p>
+        </div>
+
+        <div class="category-section-icon">
+            📦
+        </div>
+
+    </div>
+
+
+    @if (Model.Products.Any())
+    {
+        <div class="category-product-grid">
+
+            @foreach (var product in Model.Products)
+            {
+                <a asp-controller="Product"
+                   asp-action="Details"
+                   asp-route-id="@product.ProductId"
+                   class="category-product-link">
+
+                    <div class="category-product-card">
+
+                        <div class="category-product-image">
+
+                            @if (!string.IsNullOrEmpty(product.ImagePath))
+                            {
+                                <img src="@product.ImagePath"
+                                     alt="@product.Name" />
+                            }
+                            else
+                            {
+                                <div class="category-no-image">
+                                    📦
+                                </div>
+                            }
+
+                        </div>
+
+
+                        <div class="category-product-content">
+
+                            <h3>
+                                @product.Name
+                            </h3>
+
+                            <span class="category-product-name">
+                                @Model.Name
+                            </span>
+
+
+                            <div class="category-product-info">
+
+                                <div>
+                                    <span>PRICE</span>
+
+                                    <strong>
+                                        ₹@product.SellingPrice.ToString("0.##")
+                                    </strong>
+                                </div>
+
+
+                                <div>
+                                    <span>QUANTITY</span>
+
+                                    <strong>
+                                        @product.StockQuantity
+                                    </strong>
+                                </div>
+
+                            </div>
+
+
+                            @if (product.StockQuantity == 0)
+                            {
+                                <div class="category-stock-status out">
+                                    Out of Stock
+                                </div>
+                            }
+                            else if (product.StockQuantity < 10)
+                            {
+                                <div class="category-stock-status low">
+                                    Low Stock
+                                </div>
+                            }
+                            else
+                            {
+                                <div class="category-stock-status available">
+                                    Available
+                                </div>
+                            }
+
+
+                            <div class="category-view-product">
+                                View Details →
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </a>
+            }
+
+        </div>
+    }
+    else
+    {
+        <div class="category-empty-products">
+
+            <div class="category-empty-icon">
+                📦
+            </div>
+
+            <h3>
+                No Products
+            </h3>
+
+            <p>
+                There are currently no products in this category.
+            </p>
+
+            @if (isAdmin)
+            {
+                <a asp-controller="Product"
+                   asp-action="Create"
+                   class="btn btn-primary">
+                    + Add Product
+                </a>
+            }
+
+        </div>
+    }
+
+</div>
+
+
+<!-- ACTIONS -->
+
+<div class="category-details-actions">
+
+    @if (isAdmin)
+    {
+        <a asp-action="Edit"
+           asp-route-id="@Model.CategoryId"
+           class="btn btn-warning">
+            Edit Category
+        </a>
+
+        <a asp-action="Delete"
+           asp-route-id="@Model.CategoryId"
+           class="btn btn-danger">
+            Delete Category
+        </a>
+    }
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        ← Back to Categories
+    </a>
+
+</div>
+
+
+</div>

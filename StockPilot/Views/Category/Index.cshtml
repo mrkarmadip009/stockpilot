@@ -1,62 +1,248 @@
 @model IEnumerable<StockPilot.Models.Category>
 
 @{
-    ViewData["Title"] = "Categories";
+ViewData["Title"] = "Categories";
+bool isAdmin = User.IsInRole("Admin");
 }
 
-<h1>Categories</h1>
+<div class="categories-page">
 
-<a asp-action="Create" class="btn btn-primary mb-3">
-    Add Category
-</a>
 
-<table class="table table-bordered">
+<div class="categories-page-header">
 
-    <thead>
-        <tr>
-            <th>Category Name</th>
-            <th>Products</th>
-            <th>Actions</th>
-        </tr>
-    </thead>
+    <div>
 
-    <tbody>
+        <div class="dashboard-eyebrow">
+            STOCKPILOT INVENTORY
+        </div>
 
-        @foreach (var item in Model)
+        <h1>Categories</h1>
+
+        <p>
+            Manage your product categories.
+        </p>
+
+    </div>
+
+    <div class="categories-header-actions">
+
+        <div class="categories-search-box">
+
+            <span>⌕</span>
+
+            <input type="text"
+                   id="categorySearch"
+                   placeholder="Search categories..." />
+
+        </div>
+
+        @if (isAdmin)
         {
-            <tr>
-                <td>
-                    @item.Name
-                </td>
-
-                <td>
-                    @item.Products.Count
-                </td>
-
-                <td>
-
-                    <a asp-action="Details"
-                       asp-route-id="@item.CategoryId"
-                       class="btn btn-info">
-                        Details
-                    </a>
-
-                    <a asp-action="Edit"
-                       asp-route-id="@item.CategoryId"
-                       class="btn btn-warning">
-                        Edit
-                    </a>
-
-                    <a asp-action="Delete"
-                       asp-route-id="@item.CategoryId"
-                       class="btn btn-danger">
-                        Delete
-                    </a>
-
-                </td>
-            </tr>
+            <a asp-action="Create"
+               class="btn btn-primary">
+                + Add Category
+            </a>
         }
 
-    </tbody>
+        <a asp-controller="Dashboard"
+           asp-action="Index"
+           class="btn btn-secondary">
+            ← Dashboard
+        </a>
 
-</table>
+    </div>
+
+</div>
+
+
+@if (Model.Any())
+{
+    <div class="category-card-grid"
+         id="categoryGrid">
+
+        @foreach (var category in Model)
+        {
+            <div class="category-card-link category-search-item"
+                 data-name="@category.Name">
+
+                <div class="category-card">
+
+                    <!-- Clickable main part of category card -->
+                    <a asp-action="Details"
+                       asp-route-id="@category.CategoryId"
+                       class="category-main-link">
+
+                        <div class="category-card-top">
+
+                            <div class="category-icon">
+                                ▤
+                            </div>
+
+                            <span class="category-id">
+                                ID #@category.CategoryId
+                            </span>
+
+                        </div>
+
+
+                        <div class="category-card-content">
+
+                            <h2>
+                                @category.Name
+                            </h2>
+
+                            <div class="category-product-count">
+
+                                <span>
+                                    PRODUCTS
+                                </span>
+
+                                <strong>
+                                    @category.Products.Count
+                                </strong>
+
+                            </div>
+
+                        </div>
+
+
+                        <div class="category-card-footer">
+
+                            <span>
+                                View Products
+                            </span>
+
+                            <span class="category-arrow">
+                                →
+                            </span>
+
+                        </div>
+
+                    </a>
+
+
+                    @if (isAdmin)
+                    {
+                        <div class="category-admin-actions">
+
+                            <a asp-action="Edit"
+                               asp-route-id="@category.CategoryId"
+                               class="category-edit-button">
+
+                                Edit
+
+                            </a>
+
+                            <a asp-action="Delete"
+                               asp-route-id="@category.CategoryId"
+                               class="category-delete-button">
+
+                                Delete
+
+                            </a>
+
+                        </div>
+                    }
+
+                </div>
+
+            </div>
+        }
+
+    </div>
+
+
+    <div id="categoryNoResults"
+         class="categories-empty"
+         style="display:none;">
+
+        <div class="categories-empty-icon">
+            🔍
+        </div>
+
+        <h3>
+            No Categories Found
+        </h3>
+
+        <p>
+            No category matches your search.
+        </p>
+
+    </div>
+
+}
+else
+{
+    <div class="categories-empty">
+
+        <div class="categories-empty-icon">
+            ▤
+        </div>
+
+        <h3>
+            No Categories Found
+        </h3>
+
+        <p>
+            There are currently no product categories.
+        </p>
+
+        @if (isAdmin)
+        {
+            <a asp-action="Create"
+               class="btn btn-primary">
+                + Add First Category
+            </a>
+        }
+
+    </div>
+}
+
+
+</div>
+
+<script>
+
+    document.getElementById("categorySearch").addEventListener("input", function () {
+
+        var searchText = this.value.toLowerCase();
+
+        var categories =
+            document.querySelectorAll(".category-search-item");
+
+        var visibleCategories = 0;
+
+        categories.forEach(function (category) {
+
+            var categoryName =
+                category.getAttribute("data-name").toLowerCase();
+
+            if (categoryName.includes(searchText))
+            {
+                category.style.display = "";
+                visibleCategories++;
+            }
+            else
+            {
+                category.style.display = "none";
+            }
+
+        });
+
+
+        var noResults =
+            document.getElementById("categoryNoResults");
+
+
+        if (visibleCategories == 0 && searchText != "")
+        {
+            noResults.style.display = "block";
+        }
+        else
+        {
+            noResults.style.display = "none";
+        }
+
+    });
+
+</script>
