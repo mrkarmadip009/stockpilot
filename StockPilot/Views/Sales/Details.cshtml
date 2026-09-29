@@ -1,0 +1,182 @@
+@model StockPilot.Models.Sale
+
+@{
+ViewData["Title"] = "Sale Details";
+}
+
+<div class="sale-details-page">
+
+<div class="page-header">
+
+    <div>
+
+        <div class="dashboard-eyebrow">
+            STOCKPILOT INVENTORY
+        </div>
+
+        <h1>Sale #@Model.SaleId</h1>
+
+        <p>
+            Complete details of this transaction.
+        </p>
+
+    </div>
+
+    <div>
+
+        <a asp-action="Index"
+           class="btn btn-secondary">
+            ← Sales History
+        </a>
+
+    </div>
+
+</div>
+
+
+<div class="sale-info-grid">
+
+    <div class="sale-info-card">
+
+        <span>CUSTOMER</span>
+
+        <strong>
+            @Model.CustomerName
+        </strong>
+
+    </div>
+
+    <div class="sale-info-card">
+
+        <span>DATE</span>
+
+        <strong>
+            @Model.SaleDate.ToString("dd MMM yyyy")
+        </strong>
+
+    </div>
+
+    <div class="sale-info-card">
+
+        <span>TIME</span>
+
+        <strong>
+            @Model.SaleDate.ToString("hh:mm tt")
+        </strong>
+
+    </div>
+
+    <div class="sale-info-card">
+
+        <span>SOLD BY</span>
+
+        <strong>
+            @(string.IsNullOrEmpty(Model.UserName)
+                ? "Admin"
+                : Model.UserName)
+        </strong>
+
+    </div>
+
+</div>
+
+
+<div class="sale-items-card">
+
+    <div class="sale-items-header">
+
+        <div>
+            <h2>Purchased Products</h2>
+
+            <p>
+                Products included in this bill.
+            </p>
+        </div>
+
+        <div class="sale-items-icon">
+            📦
+        </div>
+
+    </div>
+
+
+    <div class="sales-table-wrapper">
+
+        <table class="sales-history-table">
+
+            <thead>
+
+                <tr>
+                    <th>PRODUCT</th>
+                    <th>QUANTITY</th>
+                    <th>PRICE</th>
+                    <th>TOTAL</th>
+                </tr>
+
+            </thead>
+
+            <tbody>
+
+                @foreach (var item in Model.Items)
+                {
+                    <tr>
+
+                        <td>
+                            <strong>
+                                @item.Product?.Name
+                            </strong>
+                        </td>
+
+                        <td>
+                            @item.Quantity
+                        </td>
+
+                        <td>
+                            ₹@item.PriceAtSale.ToString("0.00")
+                        </td>
+
+                        <td class="sale-total">
+                            ₹@item.Total.ToString("0.00")
+                        </td>
+
+                    </tr>
+                }
+
+            </tbody>
+
+        </table>
+
+    </div>
+
+
+    <div class="sale-final-total">
+
+        <span>
+            GRAND TOTAL
+        </span>
+
+        <strong>
+            ₹@Model.TotalAmount.ToString("0.00")
+        </strong>
+
+    </div>
+
+</div>
+
+
+<div class="sale-details-bottom">
+
+    <a asp-action="Index"
+       class="btn btn-secondary">
+        ← Back to Sales History
+    </a>
+
+    <a asp-controller="Billing"
+       asp-action="Index"
+       class="btn btn-primary">
+        + New Bill
+    </a>
+
+</div>
+
+</div>

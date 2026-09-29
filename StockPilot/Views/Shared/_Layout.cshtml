@@ -80,21 +80,23 @@
 
 @if (User.IsInRole("Admin"))
 {
-    <a href="#"
-       class="nav-item">
+    <a asp-controller="Billing"
+   asp-action="Index"
+   class="nav-item">
 
-        <span class="nav-icon">₹</span>
-        <span>Billing</span>
+    <span class="nav-icon">₹</span>
+    <span>Billing</span>
 
-    </a>
+</a>
+    <a asp-controller="Sales"
+asp-action="Index"
+class="nav-item">
 
-    <a href="#"
-       class="nav-item">
+<span class="nav-icon">▥</span>
+<span>Sales</span>
 
-        <span class="nav-icon">▥</span>
-        <span>Sales</span>
+</a>
 
-    </a>
 }
 
 

@@ -1,0 +1,373 @@
+@model StockPilot.ViewModels.BillingViewModel
+
+@{
+ViewData["Title"] = "Billing";
+
+
+var products =
+    ViewBag.Products as List<StockPilot.Models.Product>
+    ?? new List<StockPilot.Models.Product>();
+
+
+}
+
+<div class="billing-page">
+
+
+<div class="billing-page-header">
+
+    <div>
+
+        <div class="dashboard-eyebrow">
+            STOCKPILOT INVENTORY
+        </div>
+
+        <h1>Billing</h1>
+
+        <p>
+            Create a new sale and update inventory automatically.
+        </p>
+
+    </div>
+
+    <div>
+
+        <a asp-controller="Dashboard"
+           asp-action="Index"
+           class="btn btn-secondary">
+
+            ← Dashboard
+
+        </a>
+
+    </div>
+
+</div>
+
+
+@if (TempData["BillingSuccess"] != null)
+{
+    <div class="billing-success">
+
+        ✓ @TempData["BillingSuccess"]
+
+    </div>
+}
+
+
+@if (TempData["BillingError"] != null)
+{
+    <div class="billing-error">
+
+        ⚠ @TempData["BillingError"]
+
+    </div>
+}
+
+
+<div class="billing-layout">
+
+
+    <!-- =========================
+         LEFT SIDE
+    ========================== -->
+
+    <div class="billing-left">
+
+
+        <div class="billing-card">
+
+            <div class="billing-card-header">
+
+                <div>
+
+                    <h2>Add Product</h2>
+
+                    <p>
+                        Select a product and quantity.
+                    </p>
+
+                </div>
+
+                <div class="billing-card-icon">
+                    +
+                </div>
+
+            </div>
+
+
+            <form asp-action="AddToCart"
+                  method="post">
+
+                @Html.AntiForgeryToken()
+
+
+                <div class="billing-form-group">
+
+                    <label>
+                        Product
+                    </label>
+
+                    <select name="productId"
+                            class="billing-form-control"
+                            required>
+
+                        <option value="">
+                            Select Product
+                        </option>
+
+                        @foreach (var product in products)
+                        {
+                            <option value="@product.ProductId">
+
+                                @product.Name
+                                -
+                                ₹@product.SellingPrice.ToString("0.##")
+                                -
+                                Stock: @product.StockQuantity
+
+                            </option>
+                        }
+
+                    </select>
+
+                </div>
+
+
+                <div class="billing-form-group">
+
+                    <label>
+                        Quantity
+                    </label>
+
+                    <input type="number"
+                           name="quantity"
+                           class="billing-form-control"
+                           min="1"
+                           value="1"
+                           required />
+
+                </div>
+
+
+                <button type="submit"
+                        class="btn btn-primary billing-add-button">
+
+                    + Add to Cart
+
+                </button>
+
+            </form>
+
+        </div>
+
+
+        <!-- =========================
+             CUSTOMER
+        ========================== -->
+
+        <div class="billing-card">
+
+            <div class="billing-card-header">
+
+                <div>
+
+                    <h2>Customer</h2>
+
+                    <p>
+                        Enter customer information.
+                    </p>
+
+                </div>
+
+                <div class="billing-card-icon">
+                    U
+                </div>
+
+            </div>
+
+
+            <div class="billing-form-group">
+
+                <label>
+                    Customer Name
+                </label>
+
+                <input type="text"
+                       id="customerName"
+                       class="billing-form-control"
+                       placeholder="Enter customer name" />
+
+            </div>
+
+        </div>
+
+    </div>
+
+
+    <!-- =========================
+         RIGHT SIDE - CART
+    ========================== -->
+
+    <div class="billing-right">
+
+        <div class="billing-card billing-cart-card">
+
+            <div class="billing-card-header">
+
+                <div>
+
+                    <h2>Current Bill</h2>
+
+                    <p>
+                        Products added to this sale.
+                    </p>
+
+                </div>
+
+                <div class="billing-cart-count">
+
+                    @Model.CartItems.Count
+
+                </div>
+
+            </div>
+
+
+            @if (Model.CartItems.Any())
+            {
+                <div class="billing-cart-items">
+
+                    @foreach (var item in Model.CartItems)
+                    {
+                        <div class="billing-cart-item">
+
+                            <div class="billing-cart-item-info">
+
+                                <strong>
+                                    @item.ProductName
+                                </strong>
+
+                                <span>
+                                    @item.Quantity ×
+                                    ₹@item.Price.ToString("0.##")
+                                </span>
+
+                            </div>
+
+
+                            <div class="billing-cart-item-right">
+
+                                <strong>
+                                    ₹@item.Total.ToString("0.##")
+                                </strong>
+
+
+                                <form asp-action="RemoveFromCart"
+                                      method="post">
+
+                                    @Html.AntiForgeryToken()
+
+                                    <input type="hidden"
+                                           name="productId"
+                                           value="@item.ProductId" />
+
+                                    <button type="submit"
+                                            class="billing-remove-button">
+
+                                        ×
+
+                                    </button>
+
+                                </form>
+
+                            </div>
+
+                        </div>
+                    }
+
+                </div>
+
+
+                <div class="billing-total">
+
+                    <span>
+                        TOTAL
+                    </span>
+
+                    <strong>
+                        ₹@Model.TotalAmount.ToString("0.##")
+                    </strong>
+
+                </div>
+
+
+                <form asp-action="CompleteSale"
+                      method="post"
+                      onsubmit="return validateCustomer();">
+
+                    @Html.AntiForgeryToken()
+
+                    <input type="hidden"
+                           name="customerName"
+                           id="hiddenCustomerName" />
+
+
+                    <button type="submit"
+                            class="billing-complete-button">
+
+                        ✓ Complete Sale
+
+                    </button>
+
+                </form>
+
+            }
+            else
+            {
+                <div class="billing-empty">
+
+                    <div class="billing-empty-icon">
+                        🛒
+                    </div>
+
+                    <h3>
+                        Cart is Empty
+                    </h3>
+
+                    <p>
+                        Add products to create a bill.
+                    </p>
+
+                </div>
+            }
+
+        </div>
+
+    </div>
+
+</div>
+
+
+</div>
+
+<script>
+
+    function validateCustomer()
+    {
+        var customerName =
+            document.getElementById("customerName").value.trim();
+
+        if (customerName === "")
+        {
+            alert("Please enter customer name.");
+            return false;
+        }
+
+        document.getElementById("hiddenCustomerName").value =
+            customerName;
+
+        return true;
+    }
+
+</script>

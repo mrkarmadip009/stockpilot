@@ -1,98 +1,105 @@
-using Microsoft.AspNetCore.Authentication.Cookies;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using StockPilot.Data;
+using StockPilot.Models;
 using StockPilot.Repositories;
 
 var builder = WebApplication.CreateBuilder(args);
 
-
-// =============================
-// MYSQL DATABASE
-// =============================
+// ------------------------------------
+// Database
+// ------------------------------------
 
 var connectionString =
-    builder.Configuration.GetConnectionString(
-        "DefaultConnection"
-    );
+builder.Configuration.GetConnectionString("DefaultConnection");
 
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
+options.UseMySql(
+connectionString,
+ServerVersion.AutoDetect(connectionString)
+));
+
+// ------------------------------------
+// Repository Dependency Injection
+// ------------------------------------
+
+builder.Services.AddScoped<IProductRepository, ProductRepository>();
+
+builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
+
+// ------------------------------------
+// ASP.NET Core Identity
+// ------------------------------------
+
+builder.Services
+.AddIdentity<User, IdentityRole>(options =>
 {
-    options.UseMySql(
-        connectionString,
-        ServerVersion.AutoDetect(connectionString)
-    );
-});
+options.Password.RequireDigit = false;
+options.Password.RequireLowercase = false;
+options.Password.RequireUppercase = false;
+options.Password.RequireNonAlphanumeric = false;
+options.Password.RequiredLength = 4;
 
 
-// =============================
-// REPOSITORIES
-// =============================
-
-builder.Services.AddScoped<
-    IProductRepository,
-    ProductRepository
->();
-
-builder.Services.AddScoped<
-    ICategoryRepository,
-    CategoryRepository
->();
+    options.User.RequireUniqueEmail = true;
+})
+.AddEntityFrameworkStores<ApplicationDbContext>()
+.AddDefaultTokenProviders();
 
 
-// =============================
-// AUTHENTICATION
-// =============================
+// ------------------------------------
+// Session
+// ------------------------------------
 
-builder.Services.AddAuthentication(
-    CookieAuthenticationDefaults.AuthenticationScheme
-)
-.AddCookie(options =>
-{
-    options.LoginPath = "/Account/Login";
+builder.Services.AddDistributedMemoryCache();
 
-    options.AccessDeniedPath =
-        "/Account/AccessDenied";
-});
+builder.Services.AddSession();
 
-
-// =============================
+// ------------------------------------
 // MVC
-// =============================
+// ------------------------------------
 
 builder.Services.AddControllersWithViews();
 
-
 var app = builder.Build();
 
-
-// =============================
-// MIDDLEWARE
-// =============================
+// ------------------------------------
+// Middleware
+// ------------------------------------
 
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+app.UseExceptionHandler("/Home/Error");
 }
 
 app.UseStaticFiles();
 
 app.UseRouting();
 
+app.UseSession();
 
-// Authentication MUST come before Authorization
 app.UseAuthentication();
 
 app.UseAuthorization();
 
-
-// =============================
-// DEFAULT ROUTE
-// =============================
+// ------------------------------------
+// Default Route
+// ------------------------------------
 
 app.MapControllerRoute(
-    name: "default",
-    pattern: "{controller=Account}/{action=Login}/{id?}"
+name: "default",
+pattern: "{controller=Account}/{action=Login}/{id?}"
 );
+
+using (var scope = app.Services.CreateScope())
+{
+var services = scope.ServiceProvider;
+
+
+await IdentitySeeder.SeedAsync(services);
+
+
+}
 
 
 app.Run();

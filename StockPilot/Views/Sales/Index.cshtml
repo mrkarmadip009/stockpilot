@@ -1,0 +1,158 @@
+@model IEnumerable<StockPilot.Models.Sale>
+
+@{
+ViewData["Title"] = "Sales History";
+}
+
+<div class="sales-history-page">
+
+
+<div class="page-header">
+
+    <div>
+
+        <div class="dashboard-eyebrow">
+            STOCKPILOT INVENTORY
+        </div>
+
+        <h1>Sales History</h1>
+
+        <p>
+            View all completed billing transactions.
+        </p>
+
+    </div>
+
+    <div class="sales-history-actions">
+
+        <a asp-controller="Billing"
+           asp-action="Index"
+           class="btn btn-primary">
+            + New Bill
+        </a>
+
+        <a asp-controller="Dashboard"
+           asp-action="Index"
+           class="btn btn-secondary">
+            ← Dashboard
+        </a>
+
+    </div>
+
+</div>
+
+
+@if (Model.Any())
+{
+    <div class="sales-history-card">
+
+        <div class="sales-history-header">
+
+            <div>
+                <h2>Completed Sales</h2>
+
+                <p>
+                    @Model.Count() completed transaction(s)
+                </p>
+            </div>
+
+            <div class="sales-history-icon">
+                ₹
+            </div>
+
+        </div>
+
+
+        <div class="sales-table-wrapper">
+
+            <table class="sales-history-table">
+
+                <thead>
+
+                    <tr>
+                        <th>SALE ID</th>
+                        <th>CUSTOMER</th>
+                        <th>DATE</th>
+                        <th>SOLD BY</th>
+                        <th>TOTAL</th>
+                        <th>ACTION</th>
+                    </tr>
+
+                </thead>
+
+                <tbody>
+
+                    @foreach (var sale in Model)
+                    {
+                        <tr>
+
+                            <td>
+                                <strong>
+                                    #@sale.SaleId
+                                </strong>
+                            </td>
+
+                            <td>
+                                @sale.CustomerName
+                            </td>
+
+                            <td>
+                                @sale.SaleDate.ToString("dd MMM yyyy, hh:mm tt")
+                            </td>
+
+                            <td>
+                                @(string.IsNullOrEmpty(sale.UserName)
+                                    ? "Admin"
+                                    : sale.UserName)
+                            </td>
+
+                            <td class="sale-total">
+                                ₹@sale.TotalAmount.ToString("0.00")
+                            </td>
+
+                            <td>
+
+                                <a asp-action="Details"
+                                   asp-route-id="@sale.SaleId"
+                                   class="sale-view-button">
+                                    View
+                                </a>
+
+                            </td>
+
+                        </tr>
+                    }
+
+                </tbody>
+
+            </table>
+
+        </div>
+
+    </div>
+}
+else
+{
+    <div class="sales-history-empty">
+
+        <div class="sales-history-empty-icon">
+            ₹
+        </div>
+
+        <h3>No Sales Yet</h3>
+
+        <p>
+            Completed billing transactions will appear here.
+        </p>
+
+        <a asp-controller="Billing"
+           asp-action="Index"
+           class="btn btn-primary">
+            Create First Bill
+        </a>
+
+    </div>
+}
+
+
+</div>

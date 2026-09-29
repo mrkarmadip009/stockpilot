@@ -1,70 +1,372 @@
 @{
-    ViewData["Title"] = "Login";
+ViewData["Title"] = "Login";
 }
 
-<div class="account-page">
+<style>
+    * {
+        box-sizing: border-box;
+    }
 
-    <div class="account-box">
+    body {
+        margin: 0;
+        background: #f5f6fb;
+        font-family: Arial, Helvetica, sans-serif;
+    }
 
-        <div class="account-logo">
-            <h1>StockPilot</h1>
-            <p>Inventory Management System</p>
+    .auth-screen {
+        min-height: 100vh;
+        display: flex;
+        background: #f5f6fb;
+    }
+
+    /* LEFT SIDE */
+
+    .auth-left {
+        width: 43%;
+        min-height: 100vh;
+        background: #17172d;
+        position: relative;
+        overflow: hidden;
+        display: flex;
+        align-items: center;
+        padding: 70px;
+        color: white;
+    }
+
+    .auth-left-content {
+        position: relative;
+        z-index: 2;
+        max-width: 470px;
+    }
+
+    .brand {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        margin-bottom: 75px;
+    }
+
+    .brand-logo {
+        width: 52px;
+        height: 52px;
+        border-radius: 14px;
+        background: linear-gradient(135deg, #6657ff, #796cff);
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 16px;
+        font-weight: 700;
+        box-shadow: 0 10px 25px rgba(102, 87, 255, 0.35);
+    }
+
+    .brand-text h2 {
+        margin: 0;
+        font-size: 21px;
+        font-weight: 700;
+    }
+
+    .brand-text p {
+        margin: 4px 0 0;
+        font-size: 12px;
+        color: #999bb5;
+    }
+
+    .auth-left h1 {
+        font-size: 43px;
+        line-height: 1.15;
+        margin: 0 0 20px;
+        font-weight: 700;
+        letter-spacing: -1px;
+    }
+
+    .auth-left h1 span {
+        color: #786bff;
+    }
+
+    .auth-left-description {
+        color: #a4a6bd;
+        font-size: 15px;
+        line-height: 1.7;
+        max-width: 390px;
+    }
+
+    .feature {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+        margin-top: 32px;
+        color: #c3c4d5;
+        font-size: 13px;
+    }
+
+    .feature-icon {
+        width: 30px;
+        height: 30px;
+        border-radius: 8px;
+        background: rgba(113, 101, 245, 0.15);
+        color: #8277ff;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+    }
+
+    /* DECORATION */
+
+    .circle-one {
+        position: absolute;
+        width: 350px;
+        height: 350px;
+        border: 1px solid rgba(119, 107, 255, 0.15);
+        border-radius: 50%;
+        right: -170px;
+        top: -100px;
+    }
+
+    .circle-two {
+        position: absolute;
+        width: 500px;
+        height: 500px;
+        border: 1px solid rgba(119, 107, 255, 0.08);
+        border-radius: 50%;
+        left: -300px;
+        bottom: -280px;
+    }
+
+    /* RIGHT SIDE */
+
+    .auth-right {
+        width: 57%;
+        min-height: 100vh;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        padding: 50px;
+    }
+
+    .auth-form-container {
+        width: 100%;
+        max-width: 430px;
+    }
+
+    .form-heading {
+        margin-bottom: 32px;
+    }
+
+    .form-heading h2 {
+        margin: 0 0 8px;
+        font-size: 30px;
+        color: #17172d;
+        font-weight: 700;
+    }
+
+    .form-heading p {
+        margin: 0;
+        color: #85899f;
+        font-size: 14px;
+    }
+
+    .validation-summary {
+        color: #dc3545;
+        font-size: 13px;
+        margin-bottom: 18px;
+    }
+
+    .form-group {
+        margin-bottom: 21px;
+    }
+
+    .form-label {
+        display: block;
+        color: #34364d;
+        font-size: 13px;
+        font-weight: 600;
+        margin-bottom: 8px;
+    }
+
+    .form-control {
+        width: 100%;
+        height: 50px;
+        border: 1px solid #dfe1ea;
+        border-radius: 9px;
+        padding: 0 15px;
+        font-size: 14px;
+        color: #24263b;
+        background: white;
+        outline: none;
+        transition: 0.2s;
+    }
+
+    .form-control::placeholder {
+        color: #a4a7b7;
+    }
+
+    .form-control:focus {
+        border-color: #7165f5;
+        box-shadow: 0 0 0 4px rgba(113, 101, 245, 0.09);
+    }
+
+    .auth-button {
+        width: 100%;
+        height: 50px;
+        border: 0;
+        border-radius: 9px;
+        background: #7165f5;
+        color: white;
+        font-size: 14px;
+        font-weight: 600;
+        cursor: pointer;
+        margin-top: 5px;
+        transition: 0.2s;
+        box-shadow: 0 6px 15px rgba(113, 101, 245, 0.18);
+    }
+
+    .auth-button:hover {
+        background: #5f53e9;
+        transform: translateY(-1px);
+    }
+
+    .switch-account {
+        text-align: center;
+        margin-top: 25px;
+        color: #85899f;
+        font-size: 13px;
+    }
+
+    .switch-account a {
+        color: #6657ff;
+        font-weight: 600;
+        text-decoration: none;
+    }
+
+    .switch-account a:hover {
+        text-decoration: underline;
+    }
+
+    .copyright {
+        text-align: center;
+        color: #a5a7b6;
+        font-size: 11px;
+        margin-top: 45px;
+    }
+
+    @@media (max-width: 850px) {
+    .auth-left {
+        display: none;
+    }
+
+    .auth-right {
+        width: 100%;
+        padding: 30px;
+    }
+}
+</style>
+
+<div class="auth-screen">
+
+
+<div class="auth-left">
+
+    <div class="circle-one"></div>
+    <div class="circle-two"></div>
+
+    <div class="auth-left-content">
+
+        <div class="brand">
+            <div class="brand-logo">
+                SP
+            </div>
+
+            <div class="brand-text">
+                <h2>StockPilot</h2>
+                <p>Inventory System</p>
+            </div>
         </div>
 
-        <h2 class="text-center mb-4">Welcome Back</h2>
+        <h1>
+            Manage your<br />
+            inventory <span>smarter.</span>
+        </h1>
+
+        <p class="auth-left-description">
+            Keep track of products, stock levels, billing and sales
+            from one simple inventory management system.
+        </p>
+
+        <div class="feature">
+            <div class="feature-icon">✓</div>
+            <span>Simple inventory management</span>
+        </div>
+
+        <div class="feature">
+            <div class="feature-icon">✓</div>
+            <span>Track products and sales easily</span>
+        </div>
+
+        <div class="feature">
+            <div class="feature-icon">✓</div>
+            <span>Everything in one place</span>
+        </div>
+
+    </div>
+
+</div>
+
+<div class="auth-right">
+
+    <div class="auth-form-container">
+
+        <div class="form-heading">
+            <h2>Welcome back</h2>
+            <p>Enter your details to access your StockPilot account.</p>
+        </div>
 
         <form asp-action="Login" method="post">
 
             <div asp-validation-summary="All"
-                 class="text-danger mb-3">
-            </div>
+                 class="validation-summary"></div>
 
-            <div class="mb-3">
-
-                <label class="form-label">
-                    Email
-                </label>
+            <div class="form-group">
+                <label class="form-label">Email address</label>
 
                 <input type="email"
                        name="email"
                        class="form-control"
                        placeholder="Enter your email"
                        required />
-
             </div>
 
-            <div class="mb-3">
-
-                <label class="form-label">
-                    Password
-                </label>
+            <div class="form-group">
+                <label class="form-label">Password</label>
 
                 <input type="password"
                        name="password"
                        class="form-control"
                        placeholder="Enter your password"
                        required />
-
             </div>
 
-            <button type="submit"
-                    class="btn btn-primary w-100">
-                Login
+            <button type="submit" class="auth-button">
+                Login to StockPilot
             </button>
 
         </form>
 
-        <div class="text-center mt-3">
-
+        <div class="switch-account">
             Don't have an account?
+            <a asp-action="Register">Create an account</a>
+        </div>
 
-            <a asp-controller="Account"
-               asp-action="Register">
-                Register
-            </a>
-
+        <div class="copyright">
+            © 2026 StockPilot · Inventory Management System
         </div>
 
     </div>
 
 </div>
+
+
+</div>
+
+@section Scripts { <partial name="_ValidationScriptsPartial" />
+}
