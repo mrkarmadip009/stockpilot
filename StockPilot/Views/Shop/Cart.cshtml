@@ -1,0 +1,271 @@
+@model IEnumerable<StockPilot.Models.CartItem>
+
+@{
+    ViewData["Title"] = "My Cart";
+
+    decimal total = 0;
+
+    foreach (var item in Model)
+    {
+        if (item.Product != null)
+        {
+            total += item.Quantity * item.Product.SellingPrice;
+        }
+    }
+}
+
+<div class="container mt-4">
+
+    <h2 class="fw-bold">Your Cart</h2>
+
+    <p class="text-muted">
+        Review your selected products.
+    </p>
+
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-info">
+            @TempData["Message"]
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="text-center mt-5">
+
+            <h4>Your cart is empty</h4>
+
+            <p class="text-muted">
+                Add some products from the shop.
+            </p>
+
+            <a asp-controller="Shop"
+               asp-action="Index"
+               class="btn btn-success">
+
+                Browse Products
+
+            </a>
+
+        </div>
+    }
+    else
+    {
+        <div class="row">
+
+            <div class="col-md-8">
+
+                @foreach (var item in Model)
+                {
+                    if (item.Product != null)
+                    {
+                        decimal itemTotal =
+                            item.Quantity *
+                            item.Product.SellingPrice;
+
+                        <div class="card mb-3 shadow-sm">
+
+                            <div class="card-body">
+
+                                <div class="row align-items-center">
+
+                                    <div class="col-md-2">
+
+                                        @if (!string.IsNullOrEmpty(
+                                            item.Product.ImagePath))
+                                        {
+                                            <img src="@item.Product.ImagePath"
+                                                 style="width:80px;
+                                                        height:80px;
+                                                        object-fit:cover;
+                                                        border-radius:10px;"
+                                                 alt="@item.Product.Name" />
+                                        }
+                                        else
+                                        {
+                                            <div class="bg-light text-center p-4">
+                                                📦
+                                            </div>
+                                        }
+
+                                    </div>
+
+                                    <div class="col-md-4">
+
+                                        <h5 class="fw-bold">
+                                            @item.Product.Name
+                                        </h5>
+
+                                        <small class="text-muted">
+                                            ₹@item.Product.SellingPrice.ToString("0.00")
+                                        </small>
+
+                                    </div>
+
+                                    <div class="col-md-3">
+
+                                        <div class="input-group">
+
+                                            <form asp-controller="Shop"
+                                                  asp-action="Decrease"
+                                                  method="post">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@item.CartItemId" />
+
+                                                <button type="submit"
+                                                        class="btn btn-outline-secondary">
+                                                    −
+                                                </button>
+
+                                            </form>
+
+                                            <span class="form-control text-center">
+                                                @item.Quantity
+                                            </span>
+
+                                            <form asp-controller="Shop"
+                                                  asp-action="Increase"
+                                                  method="post">
+
+                                                @Html.AntiForgeryToken()
+
+                                                <input type="hidden"
+                                                       name="id"
+                                                       value="@item.CartItemId" />
+
+                                                <button type="submit"
+                                                        class="btn btn-outline-secondary">
+                                                    +
+                                                </button>
+
+                                            </form>
+
+                                        </div>
+
+                                    </div>
+
+                                    <div class="col-md-3 text-end">
+
+                                        <strong>
+                                            ₹@itemTotal.ToString("0.00")
+                                        </strong>
+
+                                        <form asp-controller="Shop"
+                                              asp-action="Remove"
+                                              method="post"
+                                              class="mt-2">
+
+                                            @Html.AntiForgeryToken()
+
+                                            <input type="hidden"
+                                                   name="id"
+                                                   value="@item.CartItemId" />
+
+                                            <button type="submit"
+                                                    class="btn btn-sm btn-outline-danger">
+                                                Remove
+                                            </button>
+
+                                        </form>
+
+                                    </div>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+                    }
+                }
+
+            </div>
+
+            <div class="col-md-4">
+
+                <div class="card shadow-sm">
+
+                    <div class="card-body">
+
+                        <h4 class="fw-bold">
+                            Order Summary
+                        </h4>
+
+                        <hr />
+
+                        <div class="d-flex justify-content-between mb-3">
+
+                            <span>Total</span>
+
+                            <strong>
+                                ₹@total.ToString("0.00")
+                            </strong>
+
+                        </div>
+
+                        <form asp-controller="Shop"
+                              asp-action="Checkout"
+                              method="post">
+
+                            @Html.AntiForgeryToken()
+
+                            <div class="mb-3">
+
+                                <label class="form-label fw-bold">
+                                    Delivery Location
+                                </label>
+
+                                <textarea name="deliveryAddress"
+                                          class="form-control"
+                                          rows="4"
+                                          placeholder="Enter your full delivery address"
+                                          required></textarea>
+
+                            </div>
+
+                            <button type="submit"
+                                    class="btn btn-success w-100">
+
+                                ✓ Place Order
+
+                            </button>
+
+                        </form>
+
+                        <a asp-controller="Shop"
+                           asp-action="Index"
+                           class="btn btn-outline-secondary w-100 mt-2">
+
+                            Continue Shopping
+
+                        </a>
+
+                        <form asp-controller="Shop"
+                              asp-action="ClearCart"
+                              method="post"
+                              class="mt-2">
+
+                            @Html.AntiForgeryToken()
+
+                            <button type="submit"
+                                    class="btn btn-outline-danger w-100">
+
+                                Clear Cart
+
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    }
+
+</div>

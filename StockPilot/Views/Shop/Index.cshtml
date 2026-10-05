@@ -1,0 +1,242 @@
+@model IEnumerable<StockPilot.Models.Product>
+
+@{
+    ViewData["Title"] = "Shop";
+}
+
+<div class="container mt-4">
+
+    <!-- Header -->
+    <div class="mb-4">
+        <h2 class="fw-bold">Shop</h2>
+        <p class="text-muted">
+            Select products and add them to your cart.
+        </p>
+    </div>
+
+    <!-- Message -->
+    @if (TempData["Message"] != null)
+    {
+        <div class="alert alert-success">
+            @TempData["Message"]
+        </div>
+    }
+
+    @if (Model == null || !Model.Any())
+    {
+        <div class="alert alert-warning">
+            No products available.
+        </div>
+    }
+    else
+    {
+        <!-- Category / Section -->
+        <h4 class="fw-bold mb-3">
+            Recommended Products
+        </h4>
+
+        <!-- Horizontal Product List -->
+        <div class="d-flex gap-3 overflow-auto pb-4">
+
+            @foreach (var product in Model)
+            {
+                <div class="card shadow-sm"
+                     style="min-width:280px;
+                            max-width:280px;
+                            border:1px solid #eee;
+                            border-radius:15px;
+                            overflow:hidden;">
+
+                    <!-- Product Image -->
+                    @if (!string.IsNullOrEmpty(product.ImagePath))
+                    {
+                        <img src="@product.ImagePath"
+                             style="width:100%;
+                                    height:190px;
+                                    object-fit:cover;"
+                             alt="@product.Name" />
+                    }
+                    else
+                    {
+                        <div class="bg-light d-flex
+                                    justify-content-center
+                                    align-items-center"
+                             style="height:190px;">
+                            <span class="text-muted">
+                                No Image
+                            </span>
+                        </div>
+                    }
+
+                    <!-- Product Details -->
+                    <div class="card-body">
+
+                        <h5 class="fw-bold mb-1">
+                            @product.Name
+                        </h5>
+
+                        @if (product.Category != null)
+                        {
+                            <small class="text-muted">
+                                @product.Category.Name
+                            </small>
+                        }
+
+                        @{
+    var cartQuantities =
+        ViewBag.CartQuantities
+        as Dictionary<int, int>;
+
+    int alreadyInCart = 0;
+
+    if (cartQuantities != null &&
+        cartQuantities.ContainsKey(product.ProductId))
+    {
+        alreadyInCart =
+            cartQuantities[product.ProductId];
+    }
+
+    int availableStock =
+        product.StockQuantity - alreadyInCart;
+}
+
+<p class="text-muted small">
+    @product.Description
+</p>
+
+<div class="d-flex justify-content-between align-items-center">
+
+    <h5 class="fw-bold mb-0">
+        ₹@product.SellingPrice.ToString("0.00")
+    </h5>
+
+    <small class="text-muted">
+        Stock: @availableStock
+    </small>
+
+</div>
+
+
+                        <!-- Add To Cart Form -->
+                        <form asp-controller="Shop"
+                              asp-action="AddToCart"
+                              method="post"
+                              class="mt-3">
+
+                            @Html.AntiForgeryToken()
+
+                            <input type="hidden"
+                                   name="productId"
+                                   value="@product.ProductId" />
+
+                            <!-- Quantity -->
+                            <div class="input-group mb-2">
+
+                                <button type="button"
+                                        class="btn btn-outline-danger"
+                                        onclick="minus(@product.ProductId)">
+                                    −
+                                </button>
+
+                                <input type="text"
+                                       id="qty-@product.ProductId"
+                                       name="quantity"
+                                       value="1"
+                                       readonly
+                                       class="form-control text-center fw-bold" />
+
+                                <button type="button"
+                                        class="btn btn-outline-success"
+                                        onclick="plus(
+                                            @product.ProductId,
+                                            @availableStock
+                                        )">
+                                    +
+                                </button>
+
+                            </div>
+
+                            @if (availableStock > 0)
+{
+    <button type="submit"
+            class="btn btn-success w-100 fw-bold">
+        ADD TO CART
+    </button>
+}
+else
+{
+    <button type="button"
+            class="btn btn-secondary w-100"
+            disabled>
+        OUT OF STOCK
+    </button>
+}
+                        </form>
+
+                    </div>
+                </div>
+            }
+
+        </div>
+    }
+
+</div>
+
+
+<!-- Bottom Cart Bar -->
+
+<div class="position-fixed bottom-0 start-50 translate-middle-x
+            bg-success text-white shadow-lg
+            rounded-top-3 p-3"
+     style="width:90%; max-width:600px; z-index:1000;">
+
+    <div class="d-flex justify-content-between
+                align-items-center">
+
+        <span class="fw-bold">
+            🛒 Ready to checkout?
+        </span>
+
+        <a asp-controller="Shop"
+           asp-action="Cart"
+           class="btn btn-light fw-bold">
+            View Cart →
+        </a>
+
+    </div>
+
+</div>
+
+
+<script>
+
+    function plus(id, stock)
+    {
+        var box =
+            document.getElementById("qty-" + id);
+
+        var quantity =
+            parseInt(box.value);
+
+        if (quantity < stock)
+        {
+            box.value = quantity + 1;
+        }
+    }
+
+
+    function minus(id)
+    {
+        var box =
+            document.getElementById("qty-" + id);
+
+        var quantity =
+            parseInt(box.value);
+
+        if (quantity > 1)
+        {
+            box.value = quantity - 1;
+        }
+    }
+
+</script>

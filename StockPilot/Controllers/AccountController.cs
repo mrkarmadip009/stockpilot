@@ -1,3 +1,6 @@
+
+
+
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
@@ -5,136 +8,222 @@ using StockPilot.Models;
 
 namespace StockPilot.Controllers
 {
-public class AccountController : Controller
-{
-private readonly UserManager<User> _userManager;
-private readonly SignInManager<User> _signInManager;
-
-
-    public AccountController(
-        UserManager<User> userManager,
-        SignInManager<User> signInManager)
+    public class AccountController : Controller
     {
-        _userManager = userManager;
-        _signInManager = signInManager;
-    }
+        private readonly UserManager<User> _userManager;
+        private readonly SignInManager<User> _signInManager;
 
-
-    // ------------------------------------
-    // REGISTER - GET
-    // ------------------------------------
-
-    [AllowAnonymous]
-    public IActionResult Register()
-    {
-        return View();
-    }
-
-
-    // ------------------------------------
-    // REGISTER - POST
-    // ------------------------------------
-
-    [HttpPost]
-    [AllowAnonymous]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Register(
-        string name,
-        string email,
-        string password)
-    {
-        if (string.IsNullOrWhiteSpace(name))
+        public AccountController(
+            UserManager<User> userManager,
+            SignInManager<User> signInManager)
         {
-            ModelState.AddModelError(
-                "name",
-                "Name is required.");
+            _userManager = userManager;
+            _signInManager = signInManager;
         }
 
-        if (string.IsNullOrWhiteSpace(email))
-        {
-            ModelState.AddModelError(
-                "email",
-                "Email is required.");
-        }
 
-        if (string.IsNullOrWhiteSpace(password))
-        {
-            ModelState.AddModelError(
-                "password",
-                "Password is required.");
-        }
-
-        if (!ModelState.IsValid)
+        // REGISTER PAGE
+        [AllowAnonymous]
+        public IActionResult Register()
         {
             return View();
         }
 
 
-        var user = new User
+        // REGISTER USER
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Register(
+            string name,
+            string email,
+            string password,
+            string confirmPassword)
         {
-            UserName = email,
-            Email = email,
-            Name = name
-        };
+            // Check name
+            if (string.IsNullOrWhiteSpace(name))
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Name is required."
+                );
+            }
 
 
-        var result = await _userManager.CreateAsync(
-            user,
-            password
-        );
+            // Check email
+            if (string.IsNullOrWhiteSpace(email))
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Email is required."
+                );
+            }
 
 
-        if (result.Succeeded)
-        {
-            await _userManager.AddToRoleAsync(
-                user,
-                "User"
-            );
+            // Check password
+            if (string.IsNullOrWhiteSpace(password))
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Password is required."
+                );
+            }
 
-            return RedirectToAction("Login");
+
+            // Check confirm password
+            if (string.IsNullOrWhiteSpace(confirmPassword))
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Confirm password is required."
+                );
+            }
+
+
+            // Check both passwords
+            if (!string.IsNullOrWhiteSpace(password) &&
+                !string.IsNullOrWhiteSpace(confirmPassword))
+            {
+                if (password != confirmPassword)
+                {
+                    ModelState.AddModelError(
+                        "",
+                        "Password and Confirm Password do not match."
+                    );
+                }
+            }
+
+
+            // If there is an error
+            if (!ModelState.IsValid)
+            {
+                return View();
+            }
+
+
+            // Check whether email already exists
+            var oldUser =
+                await _userManager.FindByEmailAsync(email);
+
+            if (oldUser != null)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "This email is already registered."
+                );
+
+                return View();
+            }
+
+
+            // Create user
+            var user = new User();
+
+            user.UserName = email;
+            user.Email = email;
+            user.Name = name;
+
+
+            var result =
+                await _userManager.CreateAsync(
+                    user,
+                    password
+                );
+
+
+            // User created
+            if (result.Succeeded)
+            {
+                // Give User role
+                var roleResult =
+                    await _userManager.AddToRoleAsync(
+                        user,
+                        "User"
+                    );
+
+
+                if (!roleResult.Succeeded)
+                {
+                    foreach (var error in roleResult.Errors)
+                    {
+                        ModelState.AddModelError(
+                            "",
+                            error.Description
+                        );
+                    }
+
+                    return View();
+                }
+
+
+                // Go to login page
+                return RedirectToAction("Login");
+            }
+
+
+            // Show registration errors
+            foreach (var error in result.Errors)
+            {
+                ModelState.AddModelError(
+                    "",
+                    error.Description
+                );
+            }
+
+
+            return View();
         }
 
 
-        foreach (var error in result.Errors)
+        // LOGIN PAGE
+        [AllowAnonymous]
+        public IActionResult Login()
         {
-            ModelState.AddModelError(
-                "",
-                error.Description
-            );
+            return View();
         }
 
 
-        return View();
-    }
-
-
-    // ------------------------------------
-    // LOGIN - GET
-    // ------------------------------------
-
-    [AllowAnonymous]
-    public IActionResult Login()
-    {
-        return View();
-    }
-
-
-    // ------------------------------------
-    // LOGIN - POST
-    // ------------------------------------
-
-    [HttpPost]
-    [AllowAnonymous]
-    [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Login(
-        string email,
-        string password)
-    {
-        var user = await _userManager.FindByEmailAsync(email);
-
-
-        if (user == null)
+        // LOGIN USER
+        [HttpPost]
+        [AllowAnonymous]
+        [ValidateAntiForgeryToken]
+        public async Task<IActionResult> Login(
+            string email,
+            string password)
         {
+            var user =
+                await _userManager.FindByEmailAsync(email);
+
+
+            if (user == null)
+            {
+                ModelState.AddModelError(
+                    "",
+                    "Invalid email or password."
+                );
+
+                return View();
+            }
+
+
+            var result =
+                await _signInManager.PasswordSignInAsync(
+                    user,
+                    password,
+                    false,
+                    false
+                );
+
+
+            if (result.Succeeded)
+            {
+                return RedirectToAction(
+                    "Index",
+                    "Dashboard"
+                );
+            }
+
+
             ModelState.AddModelError(
                 "",
                 "Invalid email or password."
@@ -144,56 +233,21 @@ private readonly SignInManager<User> _signInManager;
         }
 
 
-        var result = await _signInManager.PasswordSignInAsync(
-            user,
-            password,
-            false,
-            false
-        );
-
-
-        if (result.Succeeded)
+        // LOGOUT
+        [Authorize]
+        public async Task<IActionResult> Logout()
         {
-            return RedirectToAction(
-                "Index",
-                "Dashboard"
-            );
+            await _signInManager.SignOutAsync();
+
+            return RedirectToAction("Login");
         }
 
 
-        ModelState.AddModelError(
-            "",
-            "Invalid email or password."
-        );
-
-
-        return View();
+        // ACCESS DENIED
+        [AllowAnonymous]
+        public IActionResult AccessDenied()
+        {
+            return View();
+        }
     }
-
-
-    // ------------------------------------
-    // LOGOUT
-    // ------------------------------------
-
-    [Authorize]
-    public async Task<IActionResult> Logout()
-    {
-        await _signInManager.SignOutAsync();
-
-        return RedirectToAction("Login");
-    }
-
-
-    // ------------------------------------
-    // ACCESS DENIED
-    // ------------------------------------
-
-    [AllowAnonymous]
-    public IActionResult AccessDenied()
-    {
-        return View();
-    }
-}
-
-
 }

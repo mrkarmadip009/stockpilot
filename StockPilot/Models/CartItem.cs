@@ -14,4 +14,3 @@ namespace StockPilot.Models
         public int Quantity { get; set; }
     }
 }
-

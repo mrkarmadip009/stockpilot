@@ -1,0 +1,227 @@
+@model IEnumerable<StockPilot.Models.Sale>
+
+@{
+    ViewData["Title"] = "New Orders";
+}
+
+
+<div class="container mt-4">
+
+
+    <!-- HEADER -->
+
+    <div class="mb-4">
+
+        <h2 class="fw-bold">
+            🔔 New Orders
+        </h2>
+
+        <p class="text-muted">
+            Orders waiting to be served.
+        </p>
+
+    </div>
+
+
+    <!-- NO ORDERS -->
+
+    @if (!Model.Any())
+    {
+        <div class="alert alert-success">
+
+            ✓ No pending orders right now.
+
+        </div>
+    }
+
+
+    <!-- ORDERS -->
+
+
+        @foreach (var order in Model)
+        {
+
+            <div class="card shadow-sm mb-4">
+
+
+                <div class="card-body">
+
+
+                    <!-- ORDER HEADER -->
+
+                    <div class="d-flex
+                                justify-content-between
+                                align-items-center">
+
+
+                        <div>
+
+                            <h4 class="fw-bold mb-1">
+
+                                Order #@order.SaleId
+
+                            </h4>
+
+
+                            <small class="text-muted">
+
+                                @order.SaleDate.ToString(
+                                    "dd-MM-yyyy hh:mm tt")
+
+                            </small>
+
+                        </div>
+
+
+                        <span class="badge bg-warning text-dark">
+
+                            PENDING
+
+                        </span>
+
+
+                    </div>
+
+
+                    <hr />
+
+
+                    <!-- CUSTOMER -->
+
+                    <h5 class="fw-bold">
+
+                        👤 Customer
+
+                    </h5>
+
+
+                    <p class="mb-1">
+
+                        <strong>
+
+                            @order.CustomerName
+
+                        </strong>
+
+                    </p>
+
+
+                    <p class="text-muted">
+
+                        @order.UserName
+
+                    </p>
+
+
+                    <!-- ITEMS -->
+
+                    <h5 class="fw-bold mt-4">
+
+                        🛒 Ordered Items
+
+                    </h5>
+
+
+                    <ul>
+
+                        @foreach (var item in order.Items)
+                        {
+
+                            <li>
+
+                                @(item.Product?.Name
+                                    ?? "Product")
+
+                                ×
+
+                                @item.Quantity
+
+                            </li>
+
+                        }
+
+                    </ul>
+
+
+                    <!-- TOTAL -->
+
+                    <h5 class="fw-bold mt-3">
+
+                        Total:
+
+                        ₹@order.TotalAmount.ToString("0.00")
+
+                    </h5>
+
+
+                    <!-- LOCATION -->
+
+                    <div class="card bg-light mt-4">
+
+                        <div class="card-body">
+
+
+                            <h5 class="fw-bold">
+
+                                📍 Delivery Location
+
+                            </h5>
+
+
+                            <p>
+
+                                @order.DeliveryAddress
+
+                            </p>
+
+
+                            <a href="https://www.google.com/maps/search/?api=1&query=@Uri.EscapeDataString(order.DeliveryAddress)"
+                               target="_blank"
+                               class="btn btn-primary">
+
+                                📍 Open Location in Google Maps
+
+                            </a>
+
+
+                        </div>
+
+                    </div>
+
+
+                    <!-- COMPLETE -->
+
+                    <form asp-controller="Sales"
+                          asp-action="MarkCompleted"
+                          method="post"
+                          class="mt-3">
+
+
+                        @Html.AntiForgeryToken()
+
+
+                        <input type="hidden"
+                               name="id"
+                               value="@order.SaleId" />
+
+
+                        <button type="submit"
+                                class="btn btn-success">
+
+                            ✓ Mark as Completed
+
+                        </button>
+
+
+                    </form>
+
+
+                </div>
+
+            </div>
+
+        }
+
+    
+
+</div>
